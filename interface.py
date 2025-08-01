@@ -11,6 +11,7 @@ import os
 st.set_page_config(layout="wide", page_title="FROG Interface")
 _, col1, col2, col3  = st.columns([0.2, 0.4, 0.4, 0.2])
 uploaded_file = st.sidebar.file_uploader("Upload an image")
+Transpose_button = st.sidebar.checkbox("Transpose Data", False)
 choice = st.sidebar.selectbox("Method", ['Vanilla', 'PCGP', 'ML'])
 measured_spectrum = st.sidebar.checkbox('Measured Spectrum', False)
 if measured_spectrum:
@@ -215,6 +216,7 @@ elif choice == 'PCGP':
     svd = st.sidebar.selectbox("SVD Method", ['power', 'full'])
     mode = st.sidebar.selectbox("Geometry", ['shg', 'blind'])
     start_button = st.sidebar.button("Start")
+
     if start_button:
         N = data.shape[0] * calibration
         N = int(np.round(N/2) * 2)
@@ -222,7 +224,11 @@ elif choice == 'PCGP':
             data,
             N,
         )
-        Mexp = np.sqrt(data_padded.T)
+
+        if Transpose_button:
+            data_padded = data_padded.T
+
+        Mexp = np.sqrt(data_padded)
 
         res = PCGP(Mexp, iterations=iters, mode='shg', pulse=None, gatepulse=None, svd=svd)
 
